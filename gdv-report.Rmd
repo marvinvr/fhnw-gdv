@@ -1,0 +1,75 @@
+---
+title: "Fundamentals of Data Visualization"
+output: html_notebook
+author: "Marvin von Rappard"
+---
+
+
+```{r}
+data(mtcars)
+library(ggplot2)
+library(tidyverse)
+```
+
+
+```{r}
+mtcars %>% format()
+```
+
+
+```{r}
+ggplot(mtcars, aes(hp, mpg)) +
+  geom_point() +
+  labs(x = "Horse Power (hp)", y = "Miles per gallon (mpg)", title = "Comparison between Horse Power and Miles per Gallon")
+```
+
+
+```{r}
+mtcars_cyl <- mtcars
+mtcars_cyl$cyl <- mtcars_cyl$cyl %>% factor(levels = c(4, 6, 8))
+
+mtcars_cyl %>%
+  group_by(cyl) %>%
+  summarize(avg_mpg = mean(mpg)) %>%
+  ggplot(aes(cyl, avg_mpg)) +
+  geom_col() +
+  labs(x = "Number of Cylinders", y = "Average miles per gallon (mpg)", title = "Average Miles per Gallon for each number of cylinders")
+```
+
+
+```{r}
+mtcars %>%
+  ggplot(aes(qsec, mpg)) +
+  geom_point() + 
+  labs(x = "1/4 mile time", y = "Miles per gallon (mpg)", title = "1/4 mile time compared to Miles per Gallon (mpg)")
+```
+
+```{r}
+mtcars_am <- mtcars
+mtcars_am$am <- mtcars_am$am %>% factor(levels=c(0, 1), labels=c("Manual", "Automatic"))
+
+mtcars_am %>%
+  group_by(am) %>%
+  summarize(avg_mpg = mean(mpg)) %>%
+  ggplot(aes(am, avg_mpg)) +
+  geom_col() + 
+  labs(x = "Transmission type", y = "Average miles per gallon (mpg)", title = "Average miles per gallon by transmission type")
+```
+
+```{r}
+
+mtcars_am %>%
+  ggplot(aes(x = am, y = mpg)) + 
+  geom_boxplot() +
+  labs(x = "Transmission type", y = "Miles per gallon (mpg)", title = "Spread of miles per gallon by transmission type")
+```
+
+```{r}
+mtcars %>%
+  group_by(gear) %>%
+  summarize(avg_mpg = mean(mpg)) %>%
+  ggplot(aes(x = gear, y = avg_mpg)) +
+  geom_col() +
+  labs(x = "Number of Gears", y = "Average miles per gallon (mpg)", title = "Average miles per gallon for each number of gears of a car")
+```
+
