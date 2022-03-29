@@ -151,6 +151,60 @@ ggplot(mpg, aes(displ, cty)) +
   scale_y_log10() +
   labs(x = "Engine displacement (in litres)", y = "City miles per gallon (mpg, log10)", title = "Comparison between engine displacement and miles per gallon")
 ```
+## LO4: Data Preprocessing
 
+### Adding helper columns with preprocessed information
+
+```{r}
+mpg_enhanced <- mpg
+mpg_enhanced$mpg_combined <- rowMeans(mpg[,c(8, 9)])
+
+mpg_enhanced
+```
+
+```{r}
+mpg_enhanced %>% ggplot(aes(displ, mpg_combined)) +
+  geom_point() +
+  labs(x = "Engine Displacement (in liters)", y = "Combined miles per gallon (mpg)", title = "Engine dsiplacement vs combined miles per gallon")
+```
+
+```{r}
+mpg_enhanced$transmission_type <- substr(mpg$trans, 1, 4)
+mpg_enhanced
+```
+
+```{r}
+mpg_enhanced %>% 
+  ggplot(aes(transmission_type, mpg_combined)) +
+  geom_boxplot() +
+  labs(x = "Transmission type", y = "Average combined miles per gallon", title= "Distribution of miles per gallon per type of transmission")
+```
+
+### Factorizing categorical variables
+
+```{r}
+mpg_enhanced$transmission_type <- mpg_enhanced$transmission_type %>% factor(levels = c("manu", "auto"), labels = c("Manual", "Automaitc"))
+mpg_enhanced$cyl <- mpg_enhanced$cyl %>% factor(levels = c(4, 5, 6, 8), labels = c("4 Cylinder", "5 Cylinder", "6 Cylinder", "8 Cylinder"))
+mpg_enhanced$drv <- mpg_enhanced$drv %>% factor(levels = c("r", "f", "4"), labels = c("Rear wheel drive", "Front wheel drive", "All wheel drive"))
+mpg_enhanced
+```
+
+```{r}
+mpg_enhanced %>% 
+  group_by(drv) %>%
+  summarize(avg_mpg = mean(mpg_combined)) %>%
+  ggplot(aes(drv, avg_mpg)) +
+  geom_col() +
+  labs(x = "Drive train type", y = "Average miles per gallon", title = "Average miles per gallon per drive train type")
+```
+
+```{r}
+mpg_enhanced %>% 
+  group_by(cyl) %>%
+  summarize(avg_mpg = mean(mpg_combined)) %>%
+  ggplot(aes(cyl, avg_mpg)) +
+  geom_col() +
+  labs(x = "Number of cylinders", y = "Average miles per gallon", title = "Average miles per gallon per number of cylinders in an engine")
+```
 
 
