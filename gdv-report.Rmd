@@ -113,7 +113,7 @@ mtcars_am %>%
 ### Colors
 
 ```{r}
-ggplot(mpg, aes(displ, cty, color=cyl)) +
+ggplot(mpg_cyl, aes(displ, cty, color=cyl)) +
   geom_point() +
   labs(x = "Engine displacement (in litres)", y = "City miles per gallon (mpg)", title = "Comparison between engine displacement and miles per gallon")
 ```
@@ -138,6 +138,7 @@ pie(mpg_manu$avg_mpg, labels= mpg_manu$manufacturer, col=rainbow(length(mpg_manu
 ```{r}
 mpg_manu %>% ggplot(aes(manufacturer, avg_mpg, fill = manufacturer)) +
   geom_col() +
+  scale_fill_manual(breaks = c("lincoln", "land rover", "dodge", "mercury", "jeep"), values=rainbow(length(mpg_manu$manufacturer))) +
   labs(x = "Manufacturer", y = "Average city miles per gallon (mpg)", title = "Average city miles per gallon (mpg) per manufacturer")
 ```
 
@@ -148,7 +149,7 @@ mpg_manu %>% ggplot(aes(manufacturer, avg_mpg, fill = manufacturer)) +
 ```{r}
 ggplot(mpg, aes(displ, cty)) +
   geom_point() +
-  scale_y_log10() +
+  scale_y_log10(expand = c(0, 0)) +
   labs(x = "Engine displacement (in litres)", y = "City miles per gallon (mpg, log10)", title = "Comparison between engine displacement and miles per gallon")
 ```
 ## LO4: Data Preprocessing
@@ -207,4 +208,93 @@ mpg_enhanced %>%
   labs(x = "Number of cylinders", y = "Average miles per gallon", title = "Average miles per gallon per number of cylinders in an engine")
 ```
 
+## LO4:The Grammar of Graphics
+
+### Observation design
+
+```{r}
+ggplot(mpg_cyl, aes(displ, cty)) +
+  geom_line() +
+  labs(x = "Engine displacement (in litres)", y = "City miles per gallon (mpg)", title = "Comparison between engine displacement and miles per gallon")
+```
+
+```{r}
+ggplot(mpg_cyl, aes(displ, cty)) +
+  geom_point(shape=2) +
+  labs(x = "Engine displacement (in litres)", y = "City miles per gallon (mpg)", title = "Comparison between engine displacement and miles per gallon")
+```
+
+```{r}
+ggplot(mpg_cyl, aes(displ, cty, shape=cyl)) +
+  geom_point() +
+  labs(x = "Engine displacement (in litres)", y = "City miles per gallon (mpg)", title = "Comparison between engine displacement and miles per gallon")
+```
+
+### Axis alignment
+
+```{r}
+mpg_enhanced %>%
+  group_by(year) %>%
+  summarize(avg_displ = mean(displ)) %>%
+  ggplot(aes(year, avg_displ)) +
+  geom_col() + 
+  labs(x = "Manufacturing Year", y = "Average Engine Displacement (in liters)", title = "Average Engine Displacement per Year")
+```
+
+```{r}
+mpg_enhanced %>%
+  group_by(year) %>%
+  summarize(avg_displ = mean(displ)) %>%
+  ungroup() %>%
+  ggplot(aes(avg_displ, year)) +
+  geom_col() + 
+  coord_cartesian(ylim=c(1999, 2010)) +
+  labs(x = "Average Engine Displacement (in liters)", y = "Manufacturing Year", title = "Average Engine Displacement per Year")
+```
+
+### Data separation
+
+(ended up not being used in the report)
+```{r}
+mpg_enhanced %>%
+  filter(manufacturer %in% (mpg_enhanced %>%
+    group_by(manufacturer) %>%
+    summarize(avg_mpg = mean(mpg_combined)) %>%
+    arrange(avg_mpg) %>%
+    slice(1:5))$manufacturer
+    ) %>%
+  ggplot(aes(displ, mpg_combined)) +
+  geom_point() +
+  labs(x = "Engine displacement (in litres)", y = "City miles per gallon (mpg)", title = "Comparison between engine displacement and miles per gallon", subtitle = " for the top 5 engine manufacturers in combined mpg")
+```
+
+(ended up not being used in the report)
+```{r}
+mpg_enhanced %>%
+  filter(manufacturer %in% (mpg_enhanced %>%
+    group_by(manufacturer) %>%
+    summarize(avg_mpg = mean(mpg_combined)) %>%
+    arrange(avg_mpg) %>%
+    slice(1:5))$manufacturer
+    ) %>%
+  ggplot(aes(displ, mpg_combined)) +
+  geom_point() +
+  facet_wrap(vars(manufacturer)) + 
+  labs(x = "Engine displacement (in litres)", y = "City miles per gallon (mpg)", title = "Comparison between engine displacement and miles per gallon", subtitle = " for the top 5 engine manufacturers in combined mpg")
+```
+
+```{r}
+mtcars %>%
+  ggplot(aes(drat, mpg)) +
+  geom_point() + 
+  labs(x = "Rear axle ratio", y = "Miles per gallon (mpg)", title = "Rear axle ratio compared to miles per gallon (mpg)")
+```
+
+```{r}
+mtcars %>%
+  ggplot(aes(drat, mpg)) +
+  geom_point() + 
+  facet_wrap(vars(carb)) +
+  labs(x = "Rear axle ratio", y = "Miles per gallon (mpg)", title = "Rear axle ratio compared to miles per gallon (mpg)", subtitle = "grouped by Number of carburetors")
+```
 
